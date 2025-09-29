@@ -1,0 +1,35 @@
+/* General */
+body { margin: 0; font-family: Arial, sans-serif; }
+a { text-decoration: none; color: #000; }
+ul.menu { list-style: none; display: flex; gap: 15px; }
+ul.menu li { display: inline; }
+
+/* Preloader */
+.preloader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background: #fff;
+}
+.loader {
+  width: 100px;
+  animation: spin 2s linear infinite;
+}
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Header */
+header { background: #f5f5f5; padding: 10px; }
+.top-bar { background: #ddd; padding: 5px; font-size: 14px; }
+
+/* Footer */
+footer { background: #222; color: #fff; padding: 20px; text-align: center; }
+footer a { color: #fff; }
+
+/* Responsive for mobile */
+@media (max-width: 768px) {
+  ul.menu { flex-direction: column; }
+}
