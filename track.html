@@ -79,6 +79,7 @@
 </footer>
 
 <script src="assets/js/main.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
   const trackForm = document.getElementById('trackForm');
   const trackingResult = document.getElementById('trackingResult');
@@ -88,12 +89,15 @@
   const historyTable = document.getElementById('historyTable');
   const downloadBtn = document.getElementById('downloadBtn');
 
+  // Global shipment history for PDF
+  let historyData = [];
+
   trackForm.addEventListener('submit', function(e) {
     e.preventDefault();
     const trackingNumber = document.getElementById('trackingNumber').value.trim();
     if (!trackingNumber) return alert("Please enter a tracking number.");
 
-    // Example dynamic data
+    // Random status example
     const statusOptions = ['Pending', 'In-Transit', 'Delivered'];
     const statusClass = ['pending', 'in-transit', 'delivered'];
     const randomIndex = Math.floor(Math.random() * statusOptions.length);
@@ -108,7 +112,7 @@
     estimatedDate.textContent = estDate.toLocaleDateString();
 
     // Shipment history sample
-    const historyData = [
+    historyData = [
       { date: '2025-09-25', location: 'Freetown Port', status: 'Pending' },
       { date: '2025-09-26', location: 'Conakry Port', status: 'In-Transit' },
       { date: '2025-09-27', location: 'Abidjan Port', status: 'In-Transit' },
@@ -129,9 +133,30 @@
     trackingResult.scrollIntoView({ behavior: 'smooth' });
   });
 
+  // Download PDF
   downloadBtn.addEventListener('click', function() {
-    alert("PDF download functionality coming soon.");
-    // You can integrate jsPDF for real PDF export
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    doc.setFontSize(16);
+    doc.text("SLNSA - Shipment Tracking Details", 20, 20);
+
+    doc.setFontSize(12);
+    doc.text(`Tracking Number: ${resultNumber.textContent}`, 20, 35);
+    doc.text(`Status: ${resultStatus.textContent}`, 20, 45);
+    doc.text(`Origin: Freetown Port`, 20, 55);
+    doc.text(`Destination: International Port`, 20, 65);
+    doc.text(`Estimated Delivery: ${estimatedDate.textContent}`, 20, 75);
+
+    // Add shipment history table
+    doc.text("Shipment History:", 20, 90);
+    let startY = 100;
+    historyData.forEach((item, index) => {
+      doc.text(`${item.date} | ${item.location} | ${item.status}`, 20, startY + (index * 10));
+    });
+
+    // Save the PDF
+    doc.save(`${resultNumber.textContent}_tracking.pdf`);
   });
 </script>
 
