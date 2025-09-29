@@ -1,51 +1,59 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Track Shipping - SLNSA</title>
-  <link rel="stylesheet" href="assets/css/style.css">
-  <style>
-    /* Additional styles specific for tracking page */
-    .tracking-form { max-width: 500px; margin: 20px auto; }
-    .tracking-form input, .tracking-form button { width: 100%; padding: 10px; margin: 5px 0; }
-    .tracking-result { max-width: 800px; margin: 20px auto; border: 1px solid #ddd; padding: 15px; display: none; }
-    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-    table, th, td { border: 1px solid #ccc; }
-    th, td { padding: 8px; text-align: center; }
-    .status { font-weight: bold; }
-    .status.pending { color: orange; }
-    .status.in-transit { color: blue; }
-    .status.delivered { color: green; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Track Shipment - SLNSA</title>
+<link rel="stylesheet" href="assets/css/style.css">
+<style>
+  body { font-family: Arial, sans-serif; background: #f9f9f9; }
+  header, footer { text-align: center; padding: 15px; background: #004080; color: #fff; }
+  nav a { color: #fff; margin: 0 10px; text-decoration: none; }
+  main { max-width: 900px; margin: 20px auto; padding: 15px; background: #fff; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+  .tracking-form input, .tracking-form select, .tracking-form button { width: 100%; padding: 10px; margin: 5px 0; }
+  .tracking-result { display: none; margin-top: 20px; }
+  .status { font-weight: bold; }
+  .status.pending { color: orange; }
+  .status.in-transit { color: blue; }
+  .status.delivered { color: green; }
+  .timeline { border-left: 3px solid #ccc; padding-left: 20px; margin-top: 15px; }
+  .timeline-item { margin-bottom: 15px; position: relative; padding-left: 10px; }
+  .timeline-item::before { content: ''; position: absolute; left: -10px; top: 0; width: 15px; height: 15px; border-radius: 50%; background-color: gray; }
+  .timeline-item.pending::before { background-color: orange; }
+  .timeline-item.in-transit::before { background-color: blue; }
+  .timeline-item.delivered::before { background-color: green; }
+  table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+  th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+  button { cursor: pointer; background-color: #004080; color: #fff; border: none; border-radius: 4px; padding: 10px; margin-top: 10px; }
+  #countdown { font-size: 14px; font-weight: bold; margin-top: 10px; }
+</style>
 </head>
 <body>
 
-<div class="preloader">
-  <img src="assets/images/logo.png" alt="SLNSA Logo" class="loader">
-</div>
-
 <header>
-  <h1>Track Your Shipment</h1>
+  <h1>SLNSA - Shipment Tracking</h1>
   <nav>
-    <a href="index.html">Home</a> | 
-    <a href="about.html">About</a> | 
-    <a href="services.html">Services</a> | 
-    <a href="clients.html">Clients</a> | 
-    <a href="news.html">News</a> | 
-    <a href="careers.html">Careers</a> | 
-    <a href="gallery.html">Gallery</a> | 
-    <a href="contact.html">Contact</a> | 
-    <a href="track.html">Track Shipping</a>
+    <a href="index.html">Home</a>
+    <a href="about.html">About</a>
+    <a href="services.html">Services</a>
+    <a href="contact.html">Contact</a>
+    <a href="track.html">Track</a>
   </nav>
 </header>
 
 <main>
   <section class="tracking-form">
-    <h2>Enter Tracking Number</h2>
+    <h2>Enter Tracking Information</h2>
     <form id="trackForm">
-      <input type="text" id="trackingNumber" placeholder="e.g. SLNSA123456" required>
-      <button type="submit">Track Shipment</button>
+      <input type="text" id="trackingNumber" placeholder="Tracking Number" required>
+      <input type="text" id="locationInput" placeholder="Current Location" required>
+      <select id="statusInput" required>
+        <option value="">Select Status</option>
+        <option value="Pending">Pending</option>
+        <option value="In-Transit">In-Transit</option>
+        <option value="Delivered">Delivered</option>
+      </select>
+      <button type="submit">Save & Track Shipment</button>
     </form>
   </section>
 
@@ -56,8 +64,12 @@
     <p><strong>Origin:</strong> Freetown Port</p>
     <p><strong>Destination:</strong> International Port</p>
     <p><strong>Estimated Delivery:</strong> <span id="estimatedDate"></span></p>
+    <p id="countdown"></p>
 
-    <h3>Shipment History</h3>
+    <h3>Shipment Timeline</h3>
+    <div id="timeline" class="timeline"></div>
+
+    <h3>Shipment History Table</h3>
     <table>
       <thead>
         <tr>
@@ -66,98 +78,166 @@
           <th>Status</th>
         </tr>
       </thead>
-      <tbody id="historyTable">
-      </tbody>
+      <tbody id="historyTable"></tbody>
     </table>
 
-    <button id="downloadBtn">Download Details (PDF)</button>
+    <button id="downloadBtn">Download PDF</button>
+    <button id="downloadCSV">Download CSV</button>
   </section>
 </main>
 
 <footer>
-  <p>© 2025 SLNSA. All rights reserved.</p>
+  <p>© 2025 SLNSA | Address: 5 Naimbana Street, Freetown | Email: info@slnsa.com.sl | Phone: +232 76 747 893</p>
 </footer>
 
 <script src="assets/js/main.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
-  const trackForm = document.getElementById('trackForm');
-  const trackingResult = document.getElementById('trackingResult');
-  const resultNumber = document.getElementById('resultNumber');
-  const resultStatus = document.getElementById('resultStatus');
-  const estimatedDate = document.getElementById('estimatedDate');
-  const historyTable = document.getElementById('historyTable');
-  const downloadBtn = document.getElementById('downloadBtn');
+const trackForm = document.getElementById('trackForm');
+const trackingResult = document.getElementById('trackingResult');
+const resultNumber = document.getElementById('resultNumber');
+const resultStatus = document.getElementById('resultStatus');
+const estimatedDate = document.getElementById('estimatedDate');
+const historyTable = document.getElementById('historyTable');
+const timelineEl = document.getElementById('timeline');
+const countdownEl = document.getElementById('countdown');
+const downloadBtn = document.getElementById('downloadBtn');
+const downloadCSVBtn = document.getElementById('downloadCSV');
 
-  // Global shipment history for PDF
-  let historyData = [];
+let historyData = [];
 
-  trackForm.addEventListener('submit', function(e) {
-    e.preventDefault();
-    const trackingNumber = document.getElementById('trackingNumber').value.trim();
-    if (!trackingNumber) return alert("Please enter a tracking number.");
+// Backend API base URL
+const API_BASE = 'https://your-backend-domain.com'; // replace with your deployed backend
 
-    // Random status example
-    const statusOptions = ['Pending', 'In-Transit', 'Delivered'];
-    const statusClass = ['pending', 'in-transit', 'delivered'];
-    const randomIndex = Math.floor(Math.random() * statusOptions.length);
+trackForm.addEventListener('submit', async function(e){
+  e.preventDefault();
+  const trackingNumber = document.getElementById('trackingNumber').value.trim();
+  const locationInput = document.getElementById('locationInput').value.trim();
+  const statusInput = document.getElementById('statusInput').value.trim();
 
-    resultNumber.textContent = trackingNumber;
-    resultStatus.textContent = statusOptions[randomIndex];
-    resultStatus.className = 'status ' + statusClass[randomIndex];
+  if(!trackingNumber || !locationInput || !statusInput) return alert("Please fill all fields.");
 
-    const today = new Date();
-    const estDate = new Date();
-    estDate.setDate(today.getDate() + 5);
-    estimatedDate.textContent = estDate.toLocaleDateString();
-
-    // Shipment history sample
-    historyData = [
-      { date: '2025-09-25', location: 'Freetown Port', status: 'Pending' },
-      { date: '2025-09-26', location: 'Conakry Port', status: 'In-Transit' },
-      { date: '2025-09-27', location: 'Abidjan Port', status: 'In-Transit' },
-    ];
-
-    historyTable.innerHTML = '';
-    historyData.forEach(item => {
-      const row = document.createElement('tr');
-      row.innerHTML = `
-        <td>${item.date}</td>
-        <td>${item.location}</td>
-        <td class="status ${item.status.toLowerCase().replace(' ', '-')}">${item.status}</td>
-      `;
-      historyTable.appendChild(row);
+  try {
+    const response = await fetch(`${API_BASE}/api/track`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ trackingNumber, location: locationInput, status: statusInput })
     });
+    const data = await response.json();
+    historyData = data.history;
+    displayTrackingResult(historyData, trackingNumber);
+  } catch(err) {
+    alert("Error saving shipment data: " + err.message);
+  }
+});
 
-    trackingResult.style.display = 'block';
-    trackingResult.scrollIntoView({ behavior: 'smooth' });
+async function fetchShipmentHistory(trackingNumber){
+  try {
+    const response = await fetch(`${API_BASE}/api/track/${trackingNumber}`);
+    const data = await response.json();
+    historyData = data.history;
+    displayTrackingResult(historyData, trackingNumber);
+  } catch(err){
+    alert("Error fetching shipment history: " + err.message);
+  }
+}
+
+function displayTrackingResult(historyData, trackingNumber){
+  resultNumber.textContent = trackingNumber;
+  const latestStatus = historyData[historyData.length-1].status;
+  resultStatus.textContent = latestStatus;
+  resultStatus.className = 'status ' + latestStatus.toLowerCase().replace(' ','-');
+
+  // Estimated delivery
+  const lastDate = new Date(historyData[historyData.length-1].date);
+  const estDate = new Date(lastDate);
+  estDate.setDate(lastDate.getDate()+5);
+  estimatedDate.textContent = estDate.toLocaleDateString();
+
+  // Timeline
+  timelineEl.innerHTML='';
+  historyData.forEach(item=>{
+    const div=document.createElement('div');
+    div.className=`timeline-item ${item.status.toLowerCase().replace(' ','-')}`;
+    div.innerHTML=`<strong>${new Date(item.date).toLocaleDateString()}</strong> - ${item.location} : ${item.status}`;
+    timelineEl.appendChild(div);
   });
 
-  // Download PDF
-  downloadBtn.addEventListener('click', function() {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
+  // Table
+  historyTable.innerHTML='';
+  historyData.forEach(item=>{
+    const row=document.createElement('tr');
+    row.innerHTML=`<td>${new Date(item.date).toLocaleDateString()}</td><td>${item.location}</td><td class="status ${item.status.toLowerCase().replace(' ','-')}">${item.status}</td>`;
+    historyTable.appendChild(row);
+  });
 
-    doc.setFontSize(16);
-    doc.text("SLNSA - Shipment Tracking Details", 20, 20);
+  startCountdown(estDate);
+  trackingResult.style.display='block';
+  trackingResult.scrollIntoView({behavior:'smooth'});
+}
 
+// Countdown
+function startCountdown(estDate){
+  clearInterval(window.countdownInterval);
+  window.countdownInterval=setInterval(()=>{
+    const now=new Date().getTime();
+    const distance=estDate-now;
+    if(distance<0){ countdownEl.textContent="Shipment Delivered"; clearInterval(window.countdownInterval); return; }
+    const days=Math.floor(distance/(1000*60*60*24));
+    const hours=Math.floor((distance/(1000*60*60))%24);
+    const minutes=Math.floor((distance/(1000*60))%60);
+    countdownEl.textContent=`Estimated Delivery: ${days}d ${hours}h ${minutes}m`;
+  },1000);
+}
+
+// CSV download
+downloadCSVBtn.addEventListener('click',()=>{
+  if(historyData.length===0) return alert("No data to download.");
+  let csv="Date,Location,Status\n";
+  historyData.forEach(item=>{ csv+=`${new Date(item.date).toLocaleDateString()},${item.location},${item.status}\n`; });
+  const blob=new Blob([csv],{type:'text/csv'});
+  const link=document.createElement('a');
+  link.href=URL.createObjectURL(blob);
+  link.download=`${resultNumber.textContent}_history.csv`;
+  link.click();
+});
+
+// PDF download
+downloadBtn.addEventListener('click',()=>{
+  if(historyData.length===0) return alert("No data to download.");
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  let currentY=20;
+
+  const logo = new Image();
+  logo.src='assets/images/logo.png';
+  logo.onload=function(){
+    doc.addImage(logo,'PNG',20,5,30,30);
+    doc.setFontSize(18);
+    doc.text("SLNSA",60,15);
     doc.setFontSize(12);
-    doc.text(`Tracking Number: ${resultNumber.textContent}`, 20, 35);
-    doc.text(`Status: ${resultStatus.textContent}`, 20, 45);
-    doc.text(`Origin: Freetown Port`, 20, 55);
-    doc.text(`Destination: International Port`, 20, 65);
-    doc.text(`Estimated Delivery: ${estimatedDate.textContent}`, 20, 75);
+    doc.text("Shipment Tracking Details",60,22);
 
-    // Add shipment history table
-    doc.text("Shipment History:", 20, 90);
-    let startY = 100;
-    historyData.forEach((item, index) => {
-      doc.text(`${item.date} | ${item.location} | ${item.status}`, 20, startY + (index * 10));
+    currentY+=35;
+    doc.text(`Tracking Number: ${resultNumber.textContent}`,20,currentY);
+    doc.text(`Status: ${resultStatus.textContent}`,20,currentY+7);
+    doc.text(`Origin: Freetown Port`,20,currentY+14);
+    doc.text(`Destination: International Port`,20,currentY+21);
+    doc.text(`Estimated Delivery: ${estimatedDate.textContent}`,20,currentY+28);
+
+    currentY+=40;
+    doc.text("Shipment History:",20,currentY);
+    currentY+=7;
+    historyData.forEach((item,index)=>{
+      doc.text(`${new Date(item.date).toLocaleDateString()} | ${item.location} | ${item.status}`,20,currentY + index*7);
     });
 
-    // Save the PDF
+    doc.setFontSize(10);
+    doc.text("Address: 5 Naimbana Street | Email: info@slnsa.com.sl | Phone: +232 76 747 893",20,280);
+
     doc.save(`${resultNumber.textContent}_tracking.pdf`);
-  });
+  }
+});
 </script>
 
 </body>
