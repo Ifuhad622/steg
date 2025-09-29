@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Track Shipping - SLNSA</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <style>
+    /* Additional styles specific for tracking page */
+    .tracking-form { max-width: 500px; margin: 20px auto; }
+    .tracking-form input, .tracking-form button { width: 100%; padding: 10px; margin: 5px 0; }
+    .tracking-result { max-width: 800px; margin: 20px auto; border: 1px solid #ddd; padding: 15px; display: none; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    table, th, td { border: 1px solid #ccc; }
+    th, td { padding: 8px; text-align: center; }
+    .status { font-weight: bold; }
+    .status.pending { color: orange; }
+    .status.in-transit { color: blue; }
+    .status.delivered { color: green; }
+  </style>
+</head>
+<body>
+
+<div class="preloader">
+  <img src="assets/images/logo.png" alt="SLNSA Logo" class="loader">
+</div>
+
+<header>
+  <h1>Track Your Shipment</h1>
+  <nav>
+    <a href="index.html">Home</a> | 
+    <a href="about.html">About</a> | 
+    <a href="services.html">Services</a> | 
+    <a href="clients.html">Clients</a> | 
+    <a href="news.html">News</a> | 
+    <a href="careers.html">Careers</a> | 
+    <a href="gallery.html">Gallery</a> | 
+    <a href="contact.html">Contact</a> | 
+    <a href="track.html">Track Shipping</a>
+  </nav>
+</header>
+
+<main>
+  <section class="tracking-form">
+    <h2>Enter Tracking Number</h2>
+    <form id="trackForm">
+      <input type="text" id="trackingNumber" placeholder="e.g. SLNSA123456" required>
+      <button type="submit">Track Shipment</button>
+    </form>
+  </section>
+
+  <section class="tracking-result" id="trackingResult">
+    <h2>Tracking Details</h2>
+    <p><strong>Tracking Number:</strong> <span id="resultNumber"></span></p>
+    <p><strong>Status:</strong> <span id="resultStatus" class="status"></span></p>
+    <p><strong>Origin:</strong> Freetown Port</p>
+    <p><strong>Destination:</strong> International Port</p>
+    <p><strong>Estimated Delivery:</strong> <span id="estimatedDate"></span></p>
+
+    <h3>Shipment History</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Location</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="historyTable">
+      </tbody>
+    </table>
+
+    <button id="downloadBtn">Download Details (PDF)</button>
+  </section>
+</main>
+
+<footer>
+  <p>© 2025 SLNSA. All rights reserved.</p>
+</footer>
+
+<script src="assets/js/main.js"></script>
+<script>
+  const trackForm = document.getElementById('trackForm');
+  const trackingResult = document.getElementById('trackingResult');
+  const resultNumber = document.getElementById('resultNumber');
+  const resultStatus = document.getElementById('resultStatus');
+  const estimatedDate = document.getElementById('estimatedDate');
+  const historyTable = document.getElementById('historyTable');
+  const downloadBtn = document.getElementById('downloadBtn');
+
+  trackForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const trackingNumber = document.getElementById('trackingNumber').value.trim();
+    if (!trackingNumber) return alert("Please enter a tracking number.");
+
+    // Example dynamic data
+    const statusOptions = ['Pending', 'In-Transit', 'Delivered'];
+    const statusClass = ['pending', 'in-transit', 'delivered'];
+    const randomIndex = Math.floor(Math.random() * statusOptions.length);
+
+    resultNumber.textContent = trackingNumber;
+    resultStatus.textContent = statusOptions[randomIndex];
+    resultStatus.className = 'status ' + statusClass[randomIndex];
+
+    const today = new Date();
+    const estDate = new Date();
+    estDate.setDate(today.getDate() + 5);
+    estimatedDate.textContent = estDate.toLocaleDateString();
+
+    // Shipment history sample
+    const historyData = [
+      { date: '2025-09-25', location: 'Freetown Port', status: 'Pending' },
+      { date: '2025-09-26', location: 'Conakry Port', status: 'In-Transit' },
+      { date: '2025-09-27', location: 'Abidjan Port', status: 'In-Transit' },
+    ];
+
+    historyTable.innerHTML = '';
+    historyData.forEach(item => {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${item.date}</td>
+        <td>${item.location}</td>
+        <td class="status ${item.status.toLowerCase().replace(' ', '-')}">${item.status}</td>
+      `;
+      historyTable.appendChild(row);
+    });
+
+    trackingResult.style.display = 'block';
+    trackingResult.scrollIntoView({ behavior: 'smooth' });
+  });
+
+  downloadBtn.addEventListener('click', function() {
+    alert("PDF download functionality coming soon.");
+    // You can integrate jsPDF for real PDF export
+  });
+</script>
+
+</body>
+</html>
